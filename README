@@ -1,0 +1,30 @@
+This area is for processing GDP with R using GeoKnife.
+
+1)  Install "GeoKnife" to your home R Library
+	-Installation instructions: https://github.com/USGS-R/geoknife
+	-In R enter the command:
+		install.packages("geoknife", repos = c("http://owi.usgs.gov/R","http://cran.rstudio.com/"),dependencies = TRUE)
+		This will install the package in your home directory
+
+2)  Customize climate dataset 
+	-Add Climate thredds url you want to summarize from Geo Data Portal to file 'climate_data' (Get this info from GDP)
+		http://cida.usgs.gov/thredds/dodsC/dcp/conus_t  # daily Hayhoe ARRM downscaled for CONUS
+	-Add Variables of the dataset you want to summarize to the file 'dataset_variables' (Get this info from GDP)
+		ccsm-a1b-tmax-NAm-grid
+		ccsm-a1b-tmin-NAm-grid
+
+3) Create your own slurm script from template geoKnife_template.slurm
+	-change userName to your USGS AD username on line 8: 
+		#SBATCH --mail-user=userName@usgs.gov i.e. #SBATCH --mail-user=abock@usgs.gov
+	-change userName argument in srun line to your USGS AD username on line 11:
+		srun R --no-save '--args userName Shape Attribute Climate Variable POR1 POR2' < geoknife.R
+	-Change parameters of your slurm run
+		Shape - name of shapefile uploaded to GDP (exclude the "uploaded:" portion of name"
+		Attribute - name of unique field to use as key (i.e. 'hru_id')
+		Climate - line number of climate dataset you want to summarize from file 'climate_data'
+		Variable - line number of climate dataset variable you want to summarize from file 'dataset_variables'
+		POR1 - Start Year for climate summary
+		POR2 - End Year for climate summary 
+
+4) Add multiple slurm runs for multiple variables/climate datasets for same shapefile/POR.  If you run a batch job, try not to hit the same climate thredds url with multiple
+	job submissions (D. Blodgett's request).
